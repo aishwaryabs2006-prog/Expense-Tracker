@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in — Expense Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="login-page">
+  <div class="login-bg" aria-hidden="true">
+    <div class="login-gradient"></div>
+    <div class="login-blob login-blob--1"></div>
+    <div class="login-blob login-blob--2"></div>
+    <div class="login-blob login-blob--3"></div>
+    <div class="login-blob login-blob--4"></div>
+  </div>
+
+  <div class="login-shell">
+    <div class="login-card">
+      <header class="login-brand">
+        <span class="login-brand__mark" aria-hidden="true">₹</span>
+        <div>
+          <h1 class="login-brand__title">Expense Tracker</h1>
+          <p class="login-brand__tagline">Know where your money goes!</p>
+        </div>
+      </header>
+
+      <div class="login-tabs" role="tablist">
+        <button type="button" class="login-tab login-tab--active" id="tabLogin" role="tab" aria-selected="true" aria-controls="panelLogin">
+          Log in
+        </button>
+        <button type="button" class="login-tab" id="tabSignup" role="tab" aria-selected="false" aria-controls="panelSignup">
+          Sign up
+        </button>
+      </div>
+
+      <p class="login-alert login-alert--error hidden" id="authError" role="alert"></p>
+
+      <div id="panelLogin" class="login-panel" role="tabpanel" aria-labelledby="tabLogin">
+        <form id="loginForm" class="login-form" novalidate>
+          <label class="login-field">
+            <span class="login-label">Email</span>
+            <div class="login-input-wrap">
+              <span class="login-input-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" id="loginEmail" class="login-input" name="email" autocomplete="username" required placeholder="you@example.com" />
+            </div>
+          </label>
+          <label class="login-field">
+            <span class="login-label">Password</span>
+            <div class="login-input-wrap">
+              <span class="login-input-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="loginPassword" class="login-input" name="password" autocomplete="current-password" required placeholder="Enter your password" />
+            </div>
+          </label>
+
+          <div class="login-row login-row--between">
+            <span></span>
+            <a href="#" class="login-link" id="linkForgot">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="login-btn" id="loginSubmit">
+            <span class="login-btn__text">Log in</span>
+          </button>
+
+          <p class="login-switch">
+            Don’t have an account?
+            <a href="#" class="login-link login-link--accent" id="linkToSignup">Sign up</a>
+          </p>
+        </form>
+      </div>
+
+      <div id="panelSignup" class="login-panel hidden" role="tabpanel" aria-labelledby="tabSignup">
+        <form id="signupForm" class="login-form" novalidate>
+          <label class="login-field">
+            <span class="login-label">Email</span>
+            <div class="login-input-wrap">
+              <span class="login-input-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" id="signupEmail" class="login-input" name="email" autocomplete="email" required placeholder="you@example.com" />
+            </div>
+          </label>
+          <label class="login-field">
+            <span class="login-label">Password</span>
+            <div class="login-input-wrap">
+              <span class="login-input-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="signupPassword" class="login-input" name="password" autocomplete="new-password" required placeholder="At least 6 characters" minlength="6" />
+            </div>
+          </label>
+          <label class="login-field">
+            <span class="login-label">Confirm password</span>
+            <div class="login-input-wrap">
+              <span class="login-input-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="signupConfirm" class="login-input" name="confirm" autocomplete="new-password" required placeholder="Repeat password" minlength="6" />
+            </div>
+          </label>
+
+          <button type="submit" class="login-btn" id="signupSubmit">
+            <span class="login-btn__text">Create account</span>
+          </button>
+
+          <p class="login-switch">
+            Already have an account?
+            <a href="#" class="login-link login-link--accent" id="linkToLogin">Log in</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <p class="login-footnote">Your data stays in this browser. Local demo — not a secure server login.</p>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app-bg" aria-hidden="true"></div>
+  <div class="coin-layer" id="coinLayer" aria-hidden="true"></div>
+
+  <div
+    id="welcomeOverlay"
+    class="welcome-overlay hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="welcomeTitle"
+    aria-hidden="true"
+  >
+    <div class="welcome-overlay__bg" aria-hidden="true"></div>
+    <div class="welcome-overlay__scrim" aria-hidden="true"></div>
+    <div class="welcome-overlay__inner">
+      <div id="welcomeStepPrompt" class="welcome-step">
+        <h2 id="welcomeTitle" class="welcome-overlay__title">What should we call you?</h2>
+        <p class="welcome-overlay__hint">Enter a username — we’ll use it across the app.</p>
+        <label class="welcome-field">
+          <span class="field-label">Username</span>
+          <input
+            type="text"
+            id="welcomeUsernameInput"
+            class="welcome-input"
+            maxlength="40"
+            autocomplete="nickname"
+            placeholder="e.g. Aishwarya"
+          />
+        </label>
+        <p class="welcome-error hidden" id="welcomeUsernameError" role="alert"></p>
+        <button type="button" class="btn btn--primary welcome-primary" id="welcomeUsernameSubmit">Continue</button>
+      </div>
+      <div id="welcomeStepGreet" class="welcome-step hidden">
+        <p class="welcome-greet" id="welcomeGreetText"></p>
+        <button type="button" class="btn btn--primary welcome-primary" id="welcomeContinueBtn">Get started</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon brand-icon--rupee" aria-hidden="true">₹</span>
+        <div>
+          <h1>Expense Tracker</h1>
+          <p class="tagline">Know where your money goes!</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="header-user" id="headerUser" title=""></span>
+        <button type="button" class="btn btn--ghost btn--header" id="logoutBtn">Log out</button>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <span class="theme-icon theme-icon--sun" aria-hidden="true">☀️</span>
+          <span class="theme-icon theme-icon--moon" aria-hidden="true">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="summary" aria-label="Spending summary">
+      <article class="summary-card summary-card--total">
+        <span class="summary-label">Total</span>
+        <strong class="summary-value" id="totalExpense">₹0</strong>
+      </article>
+      <article class="summary-card summary-card--today">
+        <span class="summary-label">Today</span>
+        <strong class="summary-value" id="todayExpense">₹0</strong>
+      </article>
+      <article class="summary-card summary-card--month">
+        <span class="summary-label">This month</span>
+        <strong class="summary-value" id="monthExpense">₹0</strong>
+      </article>
+    </section>
+
+    <section class="smart-widgets" aria-label="Spending mood, no-spend streak, and savings">
+      <article class="smart-card smart-card--mood" id="spendingMoodCard" data-mood="none">
+        <div class="smart-card__top">
+          <span class="smart-card__eyebrow">Budget mood</span>
+          <span class="smart-card__pill" id="moodPill" aria-hidden="true">—</span>
+        </div>
+        <p class="smart-card__lead" id="moodMessage">Set a monthly budget to see how your spending feels.</p>
+        <p class="smart-card__detail" id="moodDetail"></p>
+      </article>
+      <article class="smart-card smart-card--streak" id="noSpendCard">
+        <div class="smart-card__top">
+          <span class="smart-card__eyebrow">No-spend streak</span>
+        </div>
+        <p class="smart-card__lead" id="noSpendMessage">—</p>
+        <p class="smart-card__detail" id="noSpendSub"></p>
+        <div class="no-spend-cal hidden" id="noSpendCalendar" aria-hidden="true"></div>
+      </article>
+      <article class="smart-card smart-card--savings" id="savingsInsightCard">
+        <div class="smart-card__top">
+          <span class="smart-card__eyebrow">Savings insight</span>
+        </div>
+        <p class="smart-card__lead" id="savingsMessage">—</p>
+        <p class="smart-card__detail" id="savingsDetail"></p>
+      </article>
+    </section>
+
+    <section class="panel panel--recent" aria-labelledby="recent-activity-heading">
+      <h2 id="recent-activity-heading" class="panel-title">Recent activity</h2>
+      <p class="panel-subtle">Latest expenses you added (newest first).</p>
+      <ul class="activity-feed" id="recentActivityList" role="list"></ul>
+    </section>
+
+    <section class="panel panel--insights" aria-labelledby="insights-heading">
+      <h2 id="insights-heading" class="panel-title">Spending insights</h2>
+      <p class="insights-intro">Based on your saved expenses — updated automatically.</p>
+      <ul class="insights-list" id="insightsList" role="list"></ul>
+    </section>
+
+    <div class="main-stack">
+      <section class="panel panel--form" aria-labelledby="form-heading">
+        <h2 id="form-heading" class="panel-title">Add expense</h2>
+        <form id="expenseForm" class="expense-form" novalidate>
+          <input type="hidden" id="editId" name="editId" value="" />
+
+          <label class="field">
+            <span class="field-label">Amount (₹)</span>
+            <input type="number" id="amount" name="amount" min="0" step="0.01" placeholder="0.00" required />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Category</span>
+            <select id="category" name="category" required>
+              <option value="">Select category</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Date</span>
+            <input type="date" id="date" name="date" required />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Note</span>
+            <textarea id="note" name="note" rows="2" placeholder="Optional description"></textarea>
+          </label>
+
+          <p class="voice-hint hidden" id="voiceStatus" role="status" aria-live="polite"></p>
+
+          <div id="recurringSuggest" class="recurring-banner hidden" role="region" aria-label="Recurring expense suggestion">
+            <div class="recurring-banner__text" id="recurringSuggestText"></div>
+            <div class="recurring-banner__actions">
+              <button type="button" class="btn btn--small btn--primary" id="markRecurringBtn">Mark as recurring</button>
+              <button type="button" class="btn btn--small btn--ghost" id="dismissRecurringBtn">Dismiss</button>
+            </div>
+          </div>
+
+          <div class="form-actions form-actions--split">
+            <div class="form-actions__main">
+              <button type="submit" class="btn btn--primary" id="submitBtn">Add expense</button>
+              <button type="button" class="btn btn--ghost hidden" id="cancelEdit">Cancel edit</button>
+            </div>
+            <button
+              type="button"
+              class="btn btn--mic"
+              id="voiceBtn"
+              aria-label="Add expense by voice"
+              title="Speak e.g. &quot;spent 200 on groceries&quot;"
+            >
+              <span class="btn--mic__icon" aria-hidden="true">🎤</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel panel--list" aria-labelledby="list-heading">
+        <div class="list-header">
+          <h2 id="list-heading" class="panel-title">Your expenses</h2>
+          <div class="filters-grid" role="search">
+            <label class="field field--search">
+              <span class="field-label">Search</span>
+              <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search note, category, or amount…"
+                autocomplete="off"
+                enterkeyhint="search"
+                aria-label="Search expenses by note, category, or amount"
+              />
+            </label>
+            <label class="field field--filter">
+              <span class="field-label">Category</span>
+              <select id="filterCategory" class="filter-select filter-select--wide" aria-label="Filter by category">
+                <option value="all">All categories</option>
+              </select>
+            </label>
+            <label class="field field--date">
+              <span class="field-label">From</span>
+              <input type="date" id="dateFrom" class="filter-date" aria-label="From date" />
+            </label>
+            <label class="field field--date">
+              <span class="field-label">To</span>
+              <input type="date" id="dateTo" class="filter-date" aria-label="To date" />
+            </label>
+            <div class="field field--actions">
+              <span class="field-label field-label--spacer" aria-hidden="true">&nbsp;</span>
+              <button type="button" class="btn btn--ghost btn--full" id="clearFilters">Clear filters</button>
+            </div>
+            <div class="field field--export">
+              <span class="field-label">Export</span>
+              <button type="button" class="btn btn--ghost btn--full" id="exportCsvBtn" aria-label="Download expenses as CSV">
+                Download CSV
+              </button>
+            </div>
+          </div>
+        </div>
+        <p class="empty-state hidden" id="emptyState">No expenses yet. Add one using the form.</p>
+        <ul class="expense-list" id="expenseList" role="list"></ul>
+      </section>
+
+      <section class="budgets-grid" aria-label="Budget settings">
+        <article class="panel panel--budget" aria-labelledby="budget-heading">
+          <h2 id="budget-heading" class="panel-title">Monthly budget</h2>
+          <form id="budgetForm" class="budget-form" novalidate>
+            <label class="field">
+              <span class="field-label">Budget (₹)</span>
+              <input type="number" id="budgetInput" name="budget" min="0" step="0.01" placeholder="e.g. 25000" />
+            </label>
+            <button type="submit" class="btn btn--primary btn--full">Save monthly budget</button>
+          </form>
+          <div class="budget-status" id="budgetStatus" aria-live="polite"></div>
+          <div class="budget-usage hidden" id="budgetUsageWrap" aria-hidden="true">
+            <div class="budget-usage__labels">
+              <span>Used this month</span>
+              <span id="budgetUsagePercentText"></span>
+            </div>
+            <div class="budget-usage__track">
+              <div class="budget-usage__fill" id="budgetUsageFill"></div>
+            </div>
+            <p class="budget-threshold-msg" id="budgetThresholdMsg" role="status"></p>
+          </div>
+          <div class="budget-alert hidden" id="budgetAlert" role="alert"></div>
+        </article>
+
+        <article class="panel panel--budget" aria-labelledby="annual-budget-heading">
+          <h2 id="annual-budget-heading" class="panel-title">Annual budget</h2>
+          <form id="annualBudgetForm" class="budget-form" novalidate>
+            <label class="field">
+              <span class="field-label">Budget (₹)</span>
+              <input type="number" id="annualBudgetInput" name="annualBudget" min="0" step="0.01" placeholder="e.g. 300000" />
+            </label>
+            <button type="submit" class="btn btn--primary btn--full">Save annual budget</button>
+          </form>
+          <div class="budget-status" id="annualBudgetStatus" aria-live="polite"></div>
+          <div class="budget-alert hidden" id="annualBudgetAlert" role="alert"></div>
+        </article>
+      </section>
+
+      <section class="panel panel--chart" aria-labelledby="chart-heading">
+        <div class="panel-head">
+          <h2 id="chart-heading" class="panel-title panel-title--inline">Spending by category</h2>
+          <p class="panel-subtitle">This month</p>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-plot" id="chartPlot">
+            <canvas id="expenseChart" aria-label="Pie chart of spending by category this month"></canvas>
+          </div>
+          <p class="chart-empty hidden" id="chartEmpty">No spending recorded this month.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__tagline-box">
+      <p class="site-footer__tagline">Small savings. Big future.</p>
+    </div>
+    <p class="site-footer__note">Data saved locally in your browser</p>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

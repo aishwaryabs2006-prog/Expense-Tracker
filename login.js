@@ -26,7 +26,7 @@
 
   function showError(msg) {
     if (!msg) {
-      els.authError.classList.add("hidden");
+      els.authError.classList.add("Hidden");
       els.authError.textContent = "";
       return;
     }
